@@ -1,0 +1,4 @@
+imho
+====
+
+IsMyHackerspaceOpen Python script.
