@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-try:
-	import urllib2
-	import sys
-	import json
-	import datetime
-except Exception as e:
-	print "Import error:",str(e)
-	sys.exit(1)
+import urllib2
+import sys
+import json
+import datetime
 
-urls = ['http://it-syndikat.org/status.php']
+
+# Default URLS to be checked
+DEFAULT_URLS = ['http://it-syndikat.org/status.php']
 
 
 def checkUrl(url):
@@ -31,9 +29,40 @@ def checkUrl(url):
 	else:
 		print str(name) + " is CLOSED! (since " + str(lastChange) + ")"
 
-for url in urls:
-	try:
-		checkUrl(url)
-	except Exception as e:
-		print "Error opening url '" + str(url) + "': " + str(e)
+
+if __name__ == "__main__":	
+	urls = []
+	verbose = False
+
+	# Use program arguments as urls
+	for iArg in range(1, len(sys.argv)) :
+		arg = sys.argv[iArg]
+		if len(arg.strip()) == 0 : continue
+		if arg[0] == '-' :	# Program parameter
+			if arg == "-h" or arg == "--help" :
+				print "isITopen Script - Determine the OPEN status of your hackerspace"
+				print "  2016, Phoenix <felix@feldspaten.org>"
+				print ""
+				print "Usage: " + str(sys.argv[0]) + " [OPTIONS] [URLS]"
+				print "OPTIONS:"
+				print "  -h               Print help message"
+				print "  -v               Verbosity on"
+				sys.exit(0)
+			elif arg == "-v" or arg == "--verbose":
+				verbose = True
+			else :
+				sys.stderr.write("Illegal argument: " + arg + "\n")
+				sys.exit(1)
+
+		else :
+			urls.append(arg)
+	
+	if len(urls) == 0 : urls = DEFAULT_URLS
+	for url in urls:
+		try:
+			if verbose : print "Checking URL '" + url + "' ... "
+			checkUrl(url)
+		except Exception as e:
+			sys.stderr.write("Error opening url '" + str(url) + "': " + str(e) + "\n")
+		
 
